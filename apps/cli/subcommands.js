@@ -5,6 +5,7 @@ import {
   RabbitMQGenerator,
   TinybirdGenerator,
   UpstashKafkaGenerator,
+  DenormalizedGenerator,
 } from "@tinybirdco/mockingbird";
 
 export const subcommands = [
@@ -168,6 +169,28 @@ export const subcommands = [
       },
       topic: {
         describe: "Upstash Kafka topic",
+        demandOption: true,
+      },
+    },
+  },
+  {
+    name: "denormalized",
+    generator: DenormalizedGenerator,
+    options: {
+      address: {
+        describe: "Denormalized address",
+        demandOption: true,
+      },
+      auth: {
+        describe: "Denormalized key",
+        demandOption: true,
+      },
+      topic: {
+        describe: "Denormalized topic",
+        demandOption: true,
+      },
+      key: {
+        describe: "Event key",
         demandOption: true,
       },
     },

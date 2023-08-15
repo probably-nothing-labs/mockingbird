@@ -19,3 +19,7 @@ export {
   UpstashKafkaConfig,
   default as UpstashKafkaGenerator,
 } from "./UpstashKafkaGenerator";
+export {
+  DenormalizedConfig,
+  default as DenormalizedGenerator,
+} from "./DenormalizedGenerator";
