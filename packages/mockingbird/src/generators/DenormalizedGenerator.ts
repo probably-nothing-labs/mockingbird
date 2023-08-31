@@ -21,12 +21,12 @@ export default class DenormalizedGenerator extends BaseGenerator<DenormalizedCon
     topic_initialized: boolean = false;
 
     async sendData(data: Row[]): Promise<void> {
-        const base_url = new URL(`${this.config.address}/topics/`);
-        const topic_url = new URL(`${this.config.address}/topics/${this.config.topic}`);
+        const base_url = new URL(`${this.config.address}/v1/topics/`);
+        const topic_url = new URL(`${this.config.address}/v1/topics/${this.config.topic}`);
 
         if (!this.topic_initialized) {
             // Send the special payload
-            const eventsPayload = { events: data.map(row => ({ event: row, event_key: this.config.key })), topic_name: this.config.topic };
+            const eventsPayload = { events: data, event_key: this.config.key, topic_name: this.config.topic };
             await fetch(base_url, {
                 headers: { Authorization: `Bearer ${this.config.auth}`, "Content-Type": "application/json" },
                 method: "POST",
@@ -46,26 +46,24 @@ export default class DenormalizedGenerator extends BaseGenerator<DenormalizedCon
                 });
         }
 
-        await Promise.all(
-            data.map((row) =>
-                fetch(topic_url, {
-                    headers: { Authorization: `Bearer ${this.config.auth}`, "Content-Type": "application/json" },
-                    method: "POST",
-                    body: JSON.stringify({ event: row }),
-                })
-                    .then((res) => res.json())
-                    .then((metadata) => {
-                        if (metadata.error) {
-                            throw new Error(metadata.error);
-                        }
+        await fetch(topic_url, {
+            headers: { Authorization: `Bearer ${this.config.auth}`, "Content-Type": "application/json" },
+            method: "POST",
+            body: JSON.stringify(data),
+        })
+            .then((res) => res.json())
+            .then((metadata) => {
+                if (metadata.error) {
+                    throw new Error(metadata.error);
+                }
 
-                        this.log("info", `Denormalized Response from ${topic_url} : ${JSON.stringify(metadata)}`);
-                    })
-                    .catch((err) => {
-                        this.log("error", `Denormalized Error: ${JSON.stringify(err)}`);
-                    })
-            )
-        );
+                this.log("info", `Denormalized Response from ${topic_url} : ${JSON.stringify(metadata)}`);
+            })
+            .catch((err) => {
+                this.log("error", `Denormalized Error: ${JSON.stringify(err)}`);
+            });
+        //)
+        //);
     }
 
     constructor(config: DenormalizedConfig) {
